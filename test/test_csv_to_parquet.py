@@ -1,8 +1,8 @@
-from src.convert_parq import csv_to_parquet
+from src.convert_csv_to_parq import csv_to_parquet
 import pytest
 
 
-CSV_PATH = "data/test.csv"
+CSV_PATH = "data/test_csv.csv"
 
 # Method to test the conversion of CSV to Parquet
 def test_convert_csv_to_parquet():
