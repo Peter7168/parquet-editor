@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 import os
+import threading
 from convert_csv_to_parq import csv_to_parquet
 from convert_excel_to_parq import excel_to_parquet
 
@@ -18,9 +19,10 @@ class ParquetEditorApp:
         style.configure("TNotebook.Tab", font=("Segoe UI", 11, "bold"), padding=[10, 5])
         style.configure("TButton", font=("Segoe UI", 10), padding=6)
 
-        # Main container where all frames will swap
         self.main_container = tk.Frame(self.root, bg="white")
         self.main_container.pack(fill="both", expand=True)
+
+        self.loading_frame = None  # placeholder for loading overlay
 
         self.show_home_screen()
 
@@ -123,19 +125,51 @@ class ParquetEditorApp:
         )
         back_btn.pack(pady=(0, 10), ipadx=10, ipady=4)
 
+    def show_loading_screen(self):
+        # Create a semi-transparent overlay by using a solid color for background
+        self.loading_frame = tk.Frame(self.root, bg="#f5f5f5")  # Use a solid color here
+        self.loading_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
+
+        loading_label = tk.Label(
+            self.loading_frame,
+            text="Converting file, please wait...",
+            font=("Segoe UI", 12, "bold"),
+            bg="#f5f5f5",  # Solid color background for label
+            fg="#333"
+        )
+        loading_label.pack(pady=(150, 20))
+
+        progress = ttk.Progressbar(self.loading_frame, mode='indeterminate', length=300)
+        progress.pack()
+        progress.start(10)
+
+
+    def hide_loading_screen(self):
+        if self.loading_frame:
+            self.loading_frame.destroy()
+            self.loading_frame = None
+
     def convert_csv(self):
         file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
         if file_path:
-            output_path = os.path.splitext(file_path)[0] + ".parquet"
-            csv_to_parquet(file_path)
-            self.show_success_screen("CSV", output_path)
+            self.show_loading_screen()
+            threading.Thread(target=self._convert_csv_thread, args=(file_path,), daemon=True).start()
+
+    def _convert_csv_thread(self, file_path):
+        output_path = os.path.splitext(file_path)[0] + ".parquet"
+        csv_to_parquet(file_path)
+        self.root.after(0, lambda: (self.hide_loading_screen(), self.show_success_screen("CSV", output_path)))
 
     def convert_excel(self):
         file_path = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xls;*.xlsx")])
         if file_path:
-            output_path = os.path.splitext(file_path)[0] + ".parquet"
-            excel_to_parquet(file_path)
-            self.show_success_screen("Excel", output_path)
+            self.show_loading_screen()
+            threading.Thread(target=self._convert_excel_thread, args=(file_path,), daemon=True).start()
+
+    def _convert_excel_thread(self, file_path):
+        output_path = os.path.splitext(file_path)[0] + ".parquet"
+        excel_to_parquet(file_path)
+        self.root.after(0, lambda: (self.hide_loading_screen(), self.show_success_screen("Excel", output_path)))
 
     def clear_main_container(self):
         for widget in self.main_container.winfo_children():
