@@ -11,8 +11,9 @@ def excel_to_parquet(excel_path):
     # Find the sheet named "data" (case-insensitive)
     data_sheet_name = next((s for s in xl.sheet_names if s.lower() == "data"), None)
     
+    # Check if the "data" sheet is missing and raise an error
     if not data_sheet_name:
-        raise ValueError("No sheet named 'data' found (case-insensitive match).")
+        raise ValueError("No sheet named 'Data' found. Please ensure the sheet exists.")
     
     # Read the main data sheet
     df = xl.parse(data_sheet_name)
@@ -33,8 +34,6 @@ def excel_to_parquet(excel_path):
 
     # Convert DataFrame to Arrow Table
     table = pa.Table.from_pandas(df, preserve_index=False)
-
-
 
     # Attach metadata
     if metadata:

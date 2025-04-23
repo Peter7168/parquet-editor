@@ -125,6 +125,30 @@ class ParquetEditorApp:
         )
         back_btn.pack(pady=(0, 10), ipadx=10, ipady=4)
 
+    def show_error_screen(self, error_message):
+        self.clear_main_container()
+        error_frame = tk.Frame(self.main_container, bg="white")
+        error_frame.pack(fill="both", expand=True)
+
+        error_msg = tk.Label(
+            error_frame,
+            text=f"Error: {error_message}",
+            font=("Segoe UI", 16, "bold"),
+            fg="#FF6347",  # Red color for error
+            bg="white",
+            wraplength=540,  # Set maximum width for text wrapping
+            justify="center"
+        )
+        error_msg.pack(pady=(60, 20), padx=30)
+
+        back_button = ttk.Button(
+            error_frame,
+            text="Convert Another File",
+            command=self.show_home_screen
+        )
+        back_button.pack(pady=(0, 10), ipadx=10, ipady=4)
+
+
     def show_loading_screen(self):
         # Create a semi-transparent overlay by using a solid color for background
         self.loading_frame = tk.Frame(self.root, bg="#f5f5f5")  # Use a solid color here
@@ -142,7 +166,6 @@ class ParquetEditorApp:
         progress = ttk.Progressbar(self.loading_frame, mode='indeterminate', length=300)
         progress.pack()
         progress.start(10)
-
 
     def hide_loading_screen(self):
         if self.loading_frame:
@@ -167,9 +190,14 @@ class ParquetEditorApp:
             threading.Thread(target=self._convert_excel_thread, args=(file_path,), daemon=True).start()
 
     def _convert_excel_thread(self, file_path):
-        output_path = os.path.splitext(file_path)[0] + ".parquet"
-        excel_to_parquet(file_path)
-        self.root.after(0, lambda: (self.hide_loading_screen(), self.show_success_screen("Excel", output_path)))
+        try:
+            output_path = os.path.splitext(file_path)[0] + ".parquet"
+            excel_to_parquet(file_path)
+            self.root.after(0, lambda: (self.hide_loading_screen(), self.show_success_screen("Excel", output_path)))
+        except ValueError as e:
+            # If Excel conversion fails, show error message in the UI
+            self.root.after(0, lambda e=e: (self.hide_loading_screen(), self.show_error_screen(str(e))))
+
 
     def clear_main_container(self):
         for widget in self.main_container.winfo_children():
