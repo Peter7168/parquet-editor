@@ -1,4 +1,4 @@
-# Parquet Editor (UNDER DEVELOPMENT)
+# Parquet Editor
 
 Parquet Editor is a lightweight desktop application that converts CSV or Excel files into Parquet format. It allows users to **embed custom metadata** into the Parquet files when converting **Excel files**, making it a powerful tool for generating structured and enriched Parquet files with personalized metadata for various use cases.
 
