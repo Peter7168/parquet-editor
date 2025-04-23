@@ -1,30 +1,43 @@
-# parquet-editor  **UNDER DEVELOPMENT
+# Parquet Editor (UNDER DEVELOPMENT)
 
+Parquet Editor is a lightweight desktop application that converts CSV or Excel files into Parquet format. It allows users to **embed custom metadata** into the Parquet files when converting **Excel files**, making it a powerful tool for generating structured and enriched Parquet files with personalized metadata for various use cases.
 
-## Overview
+## What It Does
 
-The **Parquet Editor Tool** is a graphical user interface (GUI) application designed for the easy creation, editing, and customization of **Parquet** files. With this tool, users can quickly select a **CSV file**, modify its contents, add custom **metadata**, and generate a fully structured **Parquet** file ready for further use.
+- **CSV to Parquet Conversion**: Converts CSV files into Parquet format. The output contains only the data from the CSV without any additional metadata.
 
-The tool is packaged as a **standalone executable (.exe)**, making it simple to run and access without needing complex setups. It is ideal for quickly generating custom Parquet files with personalized metadata, useful for testing, prototyping, or working with big data environments.
+- **Excel to Parquet Conversion (with Custom Metadata)**: Converts Excel files with the following structure:
+  - A sheet named `Data` (case-insensitive) contains the main table data.
+  - **Other sheets in the Excel file are used as custom metadata.** Each sheet name becomes a metadata key, and the value in cell `A1` of each sheet is used as the corresponding metadata value.
+  - This allows users to embed **custom metadata** directly into the Parquet file, enhancing its structure and making it ready for more complex data workflows.
 
-### Key Features
+## Supported File Types
 
-- **CSV to Parquet Conversion**: Easily convert CSV files into Parquet format through a simple and intuitive GUI.
-- **Metadata Editing**: Add and modify metadata associated with the Parquet files during conversion.
-- **Graphical User Interface (GUI)**: User-friendly interface that allows you to select the CSV file and input metadata with minimal effort.
-- **Custom Parquet Generation**: Generate Parquet files tailored to your specific needs, including adding personalized metadata.
-- **Quick and Efficient**: Optimized for fast execution, ideal for generating test data or quick prototypes.
+| File Type | Extension        |Custom Metadata Support     |
+|-----------|------------------|----------------------------|
+| CSV       | `.csv`           | No                         |
+| Excel     | `.xlsx`, `.xls`  | Yes       |
 
-## Use Cases
+## Key Features
 
-- **Testing**: Quickly create Parquet files with custom metadata for testing and validation purposes.
-- **Prototyping**: Efficiently generate sample Parquet files for development or to explore data formats.
-- **Data Transformation**: Modify existing CSV files and convert them into the Parquet format, enriched with metadata, for use in data processing and analysis.
+- **Custom Metadata**: Easily embed custom metadata into Parquet files by converting Excel files where each sheet represents a metadata entry. The metadata content is taken from the first cell (`A1`) of each sheet and is stored as key-value pairs in the Parquet file schema.
+  
+- **CSV to Parquet**: Simple conversion from CSV to Parquet with no metadata included, ideal for straightforward data storage.
 
-## How It Works
+- **Easy to Use**: A user-friendly GUI that allows for seamless file selection and conversion without needing technical expertise.
 
-1. **Input**: Launch the application and select a CSV file to be converted into Parquet format.
-2. **Edit Metadata**: Use the GUI to add and edit metadata to be associated with the Parquet file.
-3. **Generate Parquet**: Click a button to generate and save the customized Parquet file with the data and metadata.
+## Help and Support
 
-The application simplifies the process of converting CSV files into the Parquet format and enables the addition of custom metadata without requiring any command-line knowledge.
+To report bugs or request features, open an issue at:  
+[https://github.com/Peter7168/parquet-editor](https://github.com/Peter7168/parquet-editor)
+
+## Technical Overview
+
+- **GUI**: Built with **Tkinter** for a lightweight, user-friendly desktop interface.
+- **File Processing**: Conversion and metadata embedding powered by **Pandas** and **PyArrow**.
+- **Standalone**: Packaged into a self-contained `.exe` using **PyInstaller**, so no Python installation is required to run the application.
+
+## Notes
+
+- The application allows users to convert files quickly while adding custom metadata, which can be helpful for data management, testing, and generating custom datasets.
+- No external dependencies are required to run the executable—just launch and use!
