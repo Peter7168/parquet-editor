@@ -26,6 +26,13 @@ Parquet Editor is a lightweight desktop application that converts CSV or Excel f
 
 - **Easy to Use**: A user-friendly GUI that allows for seamless file selection and conversion without needing technical expertise.
 
+
+  
+## How to install?
+Check out the latest release under github releases [here](https://github.com/Peter7168/parquet-editor/releases).
+
+
+
 ## Help and Support
 
 To report bugs or request features, open an issue at:  
