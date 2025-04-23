@@ -9,32 +9,25 @@ class ParquetEditorApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Parquet Editor")
-        self.root.geometry("600x400")
+        self.root.geometry("600x450")
         self.root.resizable(True, True)
 
-        # Styling
         self.root.configure(bg="#f5f5f5")
         style = ttk.Style()
         style.theme_use("default")
         style.configure("TNotebook.Tab", font=("Segoe UI", 11, "bold"), padding=[10, 5])
         style.configure("TButton", font=("Segoe UI", 10), padding=6)
 
-        # Notebook setup
-        self.notebook = ttk.Notebook(self.root)
-        self.notebook.pack(fill="both", expand=True, padx=10, pady=10)
+        # Main container where all frames will swap
+        self.main_container = tk.Frame(self.root, bg="white")
+        self.main_container.pack(fill="both", expand=True)
 
-        self.home_tab = ttk.Frame(self.notebook)
-        self.help_tab = ttk.Frame(self.notebook)
+        self.show_home_screen()
 
-        self.notebook.add(self.home_tab, text="Home")
-        self.notebook.add(self.help_tab, text="Help")
-
-        self.setup_home_tab()
-        self.setup_help_tab()
-
-    def setup_home_tab(self):
-        home_frame = tk.Frame(self.home_tab, bg="white")
-        home_frame.pack(expand=True, fill="both", padx=40, pady=40)
+    def show_home_screen(self):
+        self.clear_main_container()
+        home_frame = tk.Frame(self.main_container, bg="white")
+        home_frame.pack(fill="both", expand=True)
 
         title = tk.Label(
             home_frame,
@@ -43,14 +36,16 @@ class ParquetEditorApp:
             bg="white",
             fg="#333"
         )
-        title.pack(pady=(10, 30))
+        title.pack(pady=(20, 30))
 
-        # Buttons
         csv_button = ttk.Button(home_frame, text="Convert CSV to Parquet", command=self.convert_csv)
         csv_button.pack(pady=10, ipadx=10, ipady=4)
 
         excel_button = ttk.Button(home_frame, text="Convert Excel to Parquet (with metadata)", command=self.convert_excel)
         excel_button.pack(pady=10, ipadx=10, ipady=4)
+
+        help_button = ttk.Button(home_frame, text="Help & Support", command=self.show_help_screen)
+        help_button.pack(pady=10)
 
         footer = tk.Label(
             home_frame,
@@ -61,29 +56,26 @@ class ParquetEditorApp:
         )
         footer.pack(side="bottom", pady=20)
 
-    def setup_help_tab(self):
-        help_frame = tk.Frame(self.help_tab, bg="white")
-        help_frame.pack(fill="both", expand=True, padx=30, pady=30)
+    def show_help_screen(self):
+        self.clear_main_container()
+        help_frame = tk.Frame(self.main_container, bg="white")
+        help_frame.pack(fill="both", expand=True)
 
         help_title = tk.Label(
             help_frame,
             text="Help & Support",
             font=("Segoe UI", 14, "bold"),
-            bg="white",
-            anchor="w"
+            bg="white"
         )
-        help_title.pack(anchor="w", pady=(0, 10))
+        help_title.pack(anchor="w", pady=(20, 10), padx=30)
 
         help_text = (
-            " \n\n-  To report bugs or suggest features, please open an issue on the GitHub repo:\n"
-            "       https://github.com/Peter7168/parquet-editor  \n\n"
-            "- Ensure your files are properly formatted before conversion:\n\n"
-            "• CSV: No restrictions, all data in a column format in one sheet (No metadata customization).\n\n"
-            "• Excel: One sheet named 'Data' (case-insensitive) for columnar data.\n"
-            "  Metadata should be formatted as follows:\n"
-            "  - Each sheet name represents a metadata tab in the output Parquet file.\n"
-            "  - The metadata value should be written in the first cell (A1) of each sheet.\n\n"
-            
+            "\n- Report bugs or suggest features on GitHub:\n"
+            "    https://github.com/Peter7168/parquet-editor\n\n"
+            "- Ensure your files are properly formatted:\n\n"
+            "• CSV: Plain table with rows and columns.\n"
+            "• Excel: Sheet named 'Data' (case-insensitive).\n"
+            "  Metadata sheets should contain metadata in cell A1.\n"
         )
 
         help_label = tk.Label(
@@ -91,35 +83,63 @@ class ParquetEditorApp:
             text=help_text,
             font=("Segoe UI", 10),
             justify="left",
-            wraplength=500,  # wrap text at 500 pixels
+            wraplength=540,
             bg="white",
             fg="#444"
         )
-        help_label.pack(anchor="w")
+        help_label.pack(anchor="w", padx=30)
 
+        back_button = ttk.Button(help_frame, text="Back", command=self.show_home_screen)
+        back_button.pack(pady=20)
+
+    def show_success_screen(self, filetype, path):
+        self.clear_main_container()
+        success_frame = tk.Frame(self.main_container, bg="white")
+        success_frame.pack(fill="both", expand=True)
+
+        msg = tk.Label(
+            success_frame,
+            text=f"{filetype} file converted successfully!",
+            font=("Segoe UI", 16, "bold"),
+            fg="#228B22",
+            bg="white"
+        )
+        msg.pack(pady=(60, 20))
+
+        path_label = tk.Label(
+            success_frame,
+            text=f"Saved to:\n{path}",
+            font=("Segoe UI", 10),
+            fg="#444",
+            bg="white",
+            justify="center"
+        )
+        path_label.pack(pady=(0, 20))
+
+        back_btn = ttk.Button(
+            success_frame,
+            text="Convert More Files",
+            command=self.show_home_screen
+        )
+        back_btn.pack(pady=(0, 10), ipadx=10, ipady=4)
 
     def convert_csv(self):
         file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
         if file_path:
             output_path = os.path.splitext(file_path)[0] + ".parquet"
             csv_to_parquet(file_path)
-            self._show_success("CSV", output_path)
+            self.show_success_screen("CSV", output_path)
 
     def convert_excel(self):
         file_path = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xls;*.xlsx")])
         if file_path:
             output_path = os.path.splitext(file_path)[0] + ".parquet"
             excel_to_parquet(file_path)
-            self._show_success("Excel", output_path)
+            self.show_success_screen("Excel", output_path)
 
-    def _show_success(self, filetype, path):
-        success_win = tk.Toplevel(self.root)
-        success_win.title("Success")
-        success_win.geometry("400x120")
-        success_win.resizable(False, False)
-        tk.Label(success_win, text=f"{filetype} file converted successfully!", font=("Segoe UI", 12)).pack(pady=(20, 10))
-        tk.Label(success_win, text=f"Saved to:\n{path}", font=("Segoe UI", 9), fg="#555").pack(pady=(0, 10))
-        ttk.Button(success_win, text="OK", command=success_win.destroy).pack(pady=(0, 10))
+    def clear_main_container(self):
+        for widget in self.main_container.winfo_children():
+            widget.destroy()
 
 
 if __name__ == "__main__":
